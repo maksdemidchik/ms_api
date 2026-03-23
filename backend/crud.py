@@ -192,3 +192,71 @@ def get_owners_with_specific_lastname(db: Session):
         for r in result
     ]
 
+
+# Вывести площадки с масштабом больше 1.5
+def get_places_with_scale_gt_1_5(db: Session):
+    """Получить места с масштабом больше 1.5"""
+    result = (
+        db.query(
+            models.Place.id,
+            models.Place.location,
+            models.Place.scale
+        )
+        .filter(models.Place.scale > 1.5)
+        .all()
+    )
+    return [
+        {
+            "id": r[0],
+            "location": r[1],
+            "scale": r[2]
+        }
+        for r in result
+    ]
+
+# Найти топ-3 самых масштабных площадок в Москве
+def get_places_by_location_moscow(db: Session):
+    """Получить топ-3 самых масштабных площадок в Москве"""
+    result = (
+        db.query(
+            models.Place.id,
+            models.Place.location,
+            models.Place.scale
+        )
+        .filter(models.Place.location.like('%Москва%'))
+        .order_by(models.Place.scale.desc())
+        .limit(3)
+        .all()
+    )
+    
+    return [
+        {
+            "id": r[0],
+            "location": r[1],
+            "scale": r[2]
+        }
+        for r in result
+    ]
+
+# Найти самые "путешествующие" экспонаты
+def get_moves_statistics(db: Session):
+    """Найти самые "путешествующие" экспонаты"""
+    result = (
+        db.query(
+            models.Move.wing_id,
+            func.count(models.Move.wing_id).label('count_wing'),
+            func.sum(models.Move.price).label('sum')
+        )
+        .group_by(models.Move.wing_id)
+        .order_by(func.count(models.Move.wing_id).desc())
+        .all()
+    )
+    
+    return [
+        {
+            "wing_id": r[0],
+            "count_wing": r[1],
+            "sum": r[2]
+        }
+        for r in result
+    ]
