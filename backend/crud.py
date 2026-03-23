@@ -213,3 +213,29 @@ def get_places_with_scale_gt_1_5(db: Session):
         }
         for r in result
     ]
+
+# Найти топ-3 самых масштабных площадок в Москве
+def get_places_by_location_moscow(db: Session):
+    """
+    Получить топ-3 самых масштабных площадок в Москве,
+    """
+    result = (
+        db.query(
+            models.Place.id,
+            models.Place.location,
+            models.Place.scale
+        )
+        .filter(models.Place.location.like('%Москва%'))
+        .order_by(models.Place.scale.desc())
+        .limit(3)
+        .all()
+    )
+    
+    return [
+        {
+            "id": r[0],
+            "location": r[1],
+            "scale": r[2]
+        }
+        for r in result
+    ]
