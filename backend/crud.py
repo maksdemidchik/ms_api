@@ -216,9 +216,7 @@ def get_places_with_scale_gt_1_5(db: Session):
 
 # Найти топ-3 самых масштабных площадок в Москве
 def get_places_by_location_moscow(db: Session):
-    """
-    Получить топ-3 самых масштабных площадок в Москве,
-    """
+    """Получить топ-3 самых масштабных площадок в Москве"""
     result = (
         db.query(
             models.Place.id,
@@ -236,6 +234,29 @@ def get_places_by_location_moscow(db: Session):
             "id": r[0],
             "location": r[1],
             "scale": r[2]
+        }
+        for r in result
+    ]
+
+# Найти самые "путешествующие" экспонаты
+def get_moves_statistics(db: Session):
+    """Найти самые "путешествующие" экспонаты"""
+    result = (
+        db.query(
+            models.Move.wing_id,
+            func.count(models.Move.wing_id).label('count_wing'),
+            func.sum(models.Move.price).label('sum')
+        )
+        .group_by(models.Move.wing_id)
+        .order_by(func.count(models.Move.wing_id).desc())
+        .all()
+    )
+    
+    return [
+        {
+            "wing_id": r[0],
+            "count_wing": r[1],
+            "sum": r[2]
         }
         for r in result
     ]

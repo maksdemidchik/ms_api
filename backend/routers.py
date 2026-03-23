@@ -221,7 +221,6 @@ def get_places_with_scale_gt_1_5(db: Session = Depends(get_db)):
     return create_response_with_sql(result)
 
 # Найти топ-3 самых масштабных площадок в Москве
-
 @router.get("/analytics/moscow_top_places", tags=["📊 Аналитика"])
 def get_moscow_top_places(db: Session = Depends(get_db)):
     """Найти топ-3 самых масштабных площадок в Москве"""
@@ -230,5 +229,17 @@ def get_moscow_top_places(db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=404, 
             detail="Площадок с локацией, содержащей 'Москва', не найдено"
+        )
+    return create_response_with_sql(result)
+
+# Найти самые "путешествующие" экспонаты
+@router.get("/analytics/moves_statistics", tags=["📊 Аналитика"])
+def get_moves_statistics(db: Session = Depends(get_db)):
+    """Получить статистику по самым "путешествующим" экспонатам"""
+    result = crud.get_moves_statistics(db)
+    if not result:
+        raise HTTPException(
+            status_code=404, 
+            detail="Данные о перемещениях не найдены"
         )
     return create_response_with_sql(result)
